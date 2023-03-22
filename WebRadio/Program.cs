@@ -13,7 +13,7 @@ builder.Services.AddCors(options =>
 {
     options.AddPolicy("AllowReactApp", builder =>
     {
-        builder.WithOrigins("http://localhost:3001") // Die URL der React-Anwendung
+        builder.AllowAnyOrigin() // Erlaube Anfragen von beliebigen Ports
               .AllowAnyHeader()
               .AllowAnyMethod();
     });
@@ -23,7 +23,6 @@ builder.Services.AddCors(options =>
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
-// Fügen Sie dies vor `var app = builder.Build();` hinzu
 LibVLCSharp.Shared.Core.Initialize();
 
 var libVlc = new LibVLC();
@@ -45,7 +44,12 @@ if (!string.IsNullOrEmpty(startupStreamUrl))
     }
 }
 
+// Hinzufügen des MediaPlayerService als Singleton
 builder.Services.AddSingleton(_ => new MediaPlayerService(mediaPlayer, libVlc));
+
+// Hinzufügen des IRadioStationProvider als Singleton
+string jsonFilePath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "radioStations.json");
+builder.Services.AddSingleton<IRadioStationProvider>(new JsonRadioStationProvider(jsonFilePath));
 
 var app = builder.Build();
 

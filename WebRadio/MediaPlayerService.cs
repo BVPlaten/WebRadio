@@ -6,6 +6,7 @@ namespace WebRadio
     {
         public MediaPlayer MediaPlayer { get; private set; }
         public LibVLC LibVLC { get; private set; }
+        private int? _previousVolume;
 
         public MediaPlayerService(MediaPlayer mediaPlayer, LibVLC libVLC)
         {
@@ -27,6 +28,20 @@ namespace WebRadio
         {
             get { return MediaPlayer.Volume; }
             set { MediaPlayer.Volume = value; }
+        }
+
+        public void ToggleMute()
+        {
+            if (_previousVolume.HasValue)
+            {
+                Volume = _previousVolume.Value;
+                _previousVolume = null;
+            }
+            else
+            {
+                _previousVolume = Volume;
+                Volume = 0;
+            }
         }
     }
 }

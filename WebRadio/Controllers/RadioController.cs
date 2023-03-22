@@ -1,6 +1,7 @@
 ﻿using LibVLCSharp.Shared;
 using Microsoft.AspNetCore.Mvc;
 using System;
+using System.Runtime.ConstrainedExecution;
 
 namespace WebRadio.Controllers
 {
@@ -14,11 +15,13 @@ namespace WebRadio.Controllers
     public class VLCController : ControllerBase
     {
         private readonly MediaPlayerService _mediaPlayer;
+        private int? _previousVolume; // Variable zum Speichern der vorherigen Lautstärke
 
         public VLCController(MediaPlayerService mediaPlayerService)
         {
             Core.Initialize();
             _mediaPlayer = mediaPlayerService;
+            _mediaPlayer.Volume = 60;
         }
 
         [HttpPost("play")]
@@ -97,14 +100,19 @@ namespace WebRadio.Controllers
         {
             try
             {
-                //int currentVolume = _mediaPlayer.Volume;
-                //int newVolume = Math.Max(0, currentVolume - 10);
-                _mediaPlayer.Volume = 0;
-                return Ok($"Volume muted.");
+                _mediaPlayer.ToggleMute();
+                if (_mediaPlayer.Volume == 0)
+                {
+                    return Ok($"Volume muted.");
+                }
+                else
+                {
+                    return Ok($"Volume restored to {_mediaPlayer.Volume}%.");
+                }
             }
             catch (Exception ex)
             {
-                return BadRequest($"Error muting volume: {ex.Message}");
+                return BadRequest($"Error toggling mute: {ex.Message}");
             }
         }
     }

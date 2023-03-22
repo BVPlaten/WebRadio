@@ -1,0 +1,50 @@
+[
+  {
+    "Name": "1Live",
+    "Url": "https://wdr-1live-live.icecastssl.wdr.de/wdr/1live/live/mp3/128/stream.mp3"
+  },
+  {
+    "Name": "WDR 2 Rheinland",
+    "Url": "https://wdr-wdr2-rheinland.icecastssl.wdr.de/wdr/wdr2/rheinland/mp3/128/stream.mp3"
+  },
+  {
+    "Name": "WDR 2 Aachen und Region",
+    "Url": "https://wdr-wdr2-aachenundregion.icecastssl.wdr.de/wdr/wdr2/aachenundregion/mp3/128/stream.mp3"
+  },
+  {
+    "Name": "WDR 3",
+    "Url": "https://wdr-wdr3-live.icecastssl.wdr.de/wdr/wdr3/live/mp3/128/stream.mp3"
+  },
+  {
+    "Name": "WDR 4",
+    "Url": "https://wdr-wdr4-live.icecastssl.wdr.de/wdr/wdr4/live/mp3/128/stream.mp3"
+  },
+  {
+    "Name": "WDR 5",
+    "Url": "https://wdr-wdr5-live.icecastssl.wdr.de/wdr/wdr5/live/mp3/128/stream.mp3"
+  },
+  {
+    "Name": "COSMO",
+    "Url": "https://wdr-cosmo-live.icecastssl.wdr.de/wdr/cosmo/live/mp3/128/stream.mp3"
+  },
+  {
+    "Name": "COSMO Trap",
+    "Url": "https://wdr-cosmo-trap.icecastssl.wdr.de/wdr/cosmo/trap/mp3/128/stream.mp3"
+  },
+  {
+    "Name": "COSMO Afrobeat",
+    "Url": "https://wdr-cosmo-afrobeat.icecastssl.wdr.de/wdr/cosmo/afrobeat/mp3/128/stream.mp3"
+  },
+  {
+    "Name": "COSMO Chillout",
+    "Url": "https://wdr-cosmo-chillout.icecastssl.wdr.de/wdr/cosmo/chillout/mp3/128/stream.mp3"
+  },
+  {
+    "Name": "COSMO Dance",
+    "Url": "https://wdr-cosmo-dance.icecastssl.wdr.de/wdr/cosmo/dance/mp3/128/stream.mp3"
+  },
+  {
+    "Name": "COSMO Special",
+    "Url": "https://wdr-cosmo-special.icecastssl.wdr.de/wdr/cosmo/special/mp3/128/stream.mp3"
+  }
+]
