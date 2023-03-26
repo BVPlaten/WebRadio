@@ -1,27 +1,37 @@
 ﻿using LibVLCSharp.Shared;
 using Microsoft.AspNetCore.Mvc;
 using System;
-using System.Runtime.ConstrainedExecution;
 
 namespace WebRadio.Controllers
 {
+    // url to the webstream with the audio data
     public class StreamUrl
     {
         public string Url { get; set; }
     }
 
+    // helper to adjust the equalizer of the vlc player
+    public class EqualizerSettings
+    {
+        public uint Preset { get; set; }
+    }
+
     [Route("api/[controller]")]
     [ApiController]
-    public class VLCController : ControllerBase
+    /*
+     * RadioController allows to play a stream, stop the stream, increase the volume, decrease the volume and mute the volume.
+     * 
+     * */
+    public class RadioController : ControllerBase
     {
         private readonly MediaPlayerService _mediaPlayer;
-        private int? _previousVolume; // Variable zum Speichern der vorherigen Lautstärke
-
-        public VLCController(MediaPlayerService mediaPlayerService)
+        private readonly Equalizer _equalizer;
+        private int? _previousVolume; // Variable stores the volume before muting
+        public RadioController(MediaPlayerService mediaPlayerService)
         {
             Core.Initialize();
             _mediaPlayer = mediaPlayerService;
-            _mediaPlayer.Volume = 60;
+            _equalizer = new Equalizer();   // TODO that does not work 
         }
 
         [HttpPost("play")]
@@ -34,10 +44,9 @@ namespace WebRadio.Controllers
 
             try
             {
-                // Stoppen Sie den aktuellen Stream, bevor Sie den neuen Stream abspielen.
-                _mediaPlayer.Stop();
+                _mediaPlayer.Stop();  // before starting a new stream the currently running stream has to be stopped
 
-                var media = new Media(_mediaPlayer.LibVLC, streamUrl.Url, FromType.FromLocation);
+                var media = new Media(_mediaPlayer._libVLC, streamUrl.Url, FromType.FromLocation);
                 _mediaPlayer.Play(media);
 
                 return Ok("Playing stream: " + streamUrl.Url);
@@ -101,19 +110,86 @@ namespace WebRadio.Controllers
             try
             {
                 _mediaPlayer.ToggleMute();
-                if (_mediaPlayer.Volume == 0)
+                return Ok($"Volume mute toggeled.");
+
+                /*
+                bool muted = _mediaPlayer.ToggleMute();
+                if (muted)
                 {
                     return Ok($"Volume muted.");
                 }
                 else
                 {
-                    return Ok($"Volume restored to {_mediaPlayer.Volume}%.");
+                    return Ok($"Volume restored.");
                 }
+                */
             }
             catch (Exception ex)
             {
                 return BadRequest($"Error toggling mute: {ex.Message}");
             }
+        }
+
+        [HttpPost("equalizer")]
+        public IActionResult SetEqualizer([FromBody] EqualizerSettings settings)
+        {
+            if (settings == null)
+            {
+                return BadRequest("Settings cannot be null.");
+            }
+
+            try
+            {
+                var equalizer = new Equalizer(settings.Preset);
+                _mediaPlayer.SetEqualizer(equalizer);
+
+                return Ok($"Equalizer preset {settings.Preset} applied.");
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError, ex.Message);
+            }
+        }
+
+        [HttpPost("set_equalizer_by_list")]
+        public IActionResult SetEqualizerByList([FromBody] List<float> gains)
+        {
+            // Zusammenfassung: SetAmp
+            //     Set a new amplification value for a particular equalizer frequency band. The
+            //     new equalizer settings are subsequently applied to a media player by invoking
+            //     MediaPlayer::setEqualizer(). The supplied amplification value will be clamped
+            //     to the -20.0 to +20.0 range. LibVLC 2.2.0 or later
+            //
+            // Parameter:
+            //   amp:
+            //     amplification value (-20.0 to 20.0 Hz)
+            //
+            //   band:
+            //     index, counting from zero, of the frequency band to set
+            if (gains == null || gains.Count != _equalizer.BandCount)
+            {
+                return BadRequest("Ungültige Eingabe für Equalizer-Verstärkungen.");
+            }
+
+            for (uint band = 0; band < _equalizer.BandCount; band++)
+            {
+                _equalizer.SetAmp(gains[(int)band], band);
+            }
+            _mediaPlayer.SetEqualizer(_equalizer);  // update equalizer of the player
+
+            return Ok("Equalizer-Einstellungen erfolgreich aktualisiert.");
+        }
+
+        [HttpGet("get_equalizer_state")]
+        public IActionResult GetEqualizerState()
+        {
+            var equalizerState = new List<float>();
+
+            for (uint band = 0; band < _equalizer.BandCount; band++)
+            {
+                equalizerState.Add(_equalizer.Amp(band));
+            }
+            return Ok(equalizerState);
         }
     }
 }

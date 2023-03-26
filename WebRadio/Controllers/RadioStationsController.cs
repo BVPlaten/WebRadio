@@ -5,6 +5,10 @@ namespace WebRadio.Controllers
 {
     [ApiController]
     [Route("api/[controller]")]
+    /*
+     * RadioStationsController allows to get all radio stations, add a new radio station and delete a radio station.
+     * 
+     * */
     public class RadioStationsController : ControllerBase
     {
         private readonly IRadioStationProvider _radioStationProvider;
